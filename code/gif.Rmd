@@ -1,0 +1,475 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#________________________________________________________________________________#
+# (Marks the max page width for printing, code within this line will be visible.)
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# resources
+
+# https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f
+# https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da
+# https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619
+# https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# setup working space - clear memory etc.
+
+# remove variables
+rm(list=ls())
+
+# remove variables and packages
+rm(list = ls(all.names = TRUE))
+
+# clear memory
+gc()
+
+```
+
+
+```{r, message=F, warning=F}
+#________________________________________________________________________________#
+# load libraries
+
+## data frame manipulation
+if(!require(tidyverse)) {install.packages("tidyverse"); library(tidyverse)}
+if(!require(lubridate)) {install.packages("lubridate"); library(lubridate)}
+
+### animated plots
+if(!require(ggplot2)) {install.packages("ggplot2"); library(ggplot2)}
+if(!require(gganimate)) {install.packages("gganimate"); library(gganimate)}
+if(!require(transformr)) {install.packages("transformr"); library(transformr)}
+if(!require(gifski)) {install.packages("gifski"); library(gifski)}
+if(!require(av)) {install.packages("av"); library(av)}
+
+### labelling plots
+if(!require(directlabels)) {install.packages("directlabels"); library(directlabels)}
+if(!require(ggrepel)) {install.packages("ggrepel"); library(ggrepel)}
+
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# load data
+# note: make sure the this script is in the same folder as the 'data' folder
+
+## load offline data
+if (TRUE) {
+  load(file.path("data", "ncov_clean.RData"))
+}
+
+## note: there was an update to the tibble package while doing this project...
+##       that has produced strange results.
+## so I have reverted back to using data frames for now.
+
+ncov <- as.data.frame(ncov)
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# create animation dataset
+
+## [1]
+ncov.gif <- ncov %>%
+  ## exclude continent summaries (aggregates)
+  filter(level == "country") %>%
+  ## only take data up to and inc. March 31st
+  filter(date < ymd("20200401")) %>%
+  ## take only a small selection of variables (more manageable)
+  select(date, iso3c, country, population, confirmed, recovered, deaths) %>%
+  mutate(anim = 1)
+
+## [2]
+## note: anim=1, absolute case numbers
+##       anim=2, cases adjusted for population (per 100k)
+## the idea is to play anim 1 first, then anim 2, as a single gif
+
+ncov.gif <- ncov.gif %>% bind_rows(
+ ncov.gif %>%
+  select(date, iso3c, country, population, confirmed, recovered, deaths) %>%
+  group_by(country) %>%
+  mutate(
+    anim = 2,
+    ### silly trick: since 'date' will be used to transition our animation,
+    ###   the second data set must be placed after the first, defined above
+    date = update(date, year=max(year(date)+1)),
+    confirmed = confirmed/(population/100000), ### per 100k population
+    recovered = recovered/(population/100000),
+    deaths = deaths/(population/100000)
+  ) %>% ungroup()  
+) %>%
+## reorder
+select(anim, everything())
+
+## [3] reduce the length of some displayed country names
+ncov.gif$country <- as.character(ncov.gif$country)
+ncov.gif$country[ncov.gif$country == "United States"] = "US"
+ncov.gif$country[ncov.gif$country == "United Kingdom"] = "UK"
+ncov.gif$country[ncov.gif$country == "United Arab Emirates"] = "UAE"
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# create animation dataset (continued...)
+
+## [1]
+## this is a simple co-ord system to place elements on our plot even if they...
+##   have different scales
+x_range <- list(lower = 0, upper = 15)
+xy_legend <- list(y = 10, x = x_range$upper)
+
+## [2]
+## custom messages to display during the animation (gif)
+## xxx_range will determine for how long a message will be visible
+
+msg1 <- "Cases in China rapidly increase in just 1 week..."
+msg1_range <- list(from= ymd("20200207"), to=ymd("20200214"))
+
+msg2 <- "...before slowing"
+msg2_range <- list(from= ymd("20200222"), to=ymd("20200228"))
+
+msg3 <- "The majority of cases in China have recovered by the end of February"
+msg3_range <- list(from= ymd("20200301"), to=ymd("20200310"))
+
+msg4 <- "COVID-19 continues to spread in Europe and the US..."
+msg4_range <- list(from= ymd("20200314"), to=ymd("20200319"))
+
+msg5 <- "...hitting Spain and Italy particularly hard"
+msg5_range <- list(from= ymd("20200319"), to=ymd("20200325"))
+
+msg6 <- "US is the new epicentre of the COVID-19 pandemic"
+msg6_range <- list(from= ymd("20200326"), to=ymd("20200401"))
+
+msg7 <- "Note: Confirmed cases per 100k population."
+msg7_range <- list(from= ymd("20210122"), to=ymd("20210331"))
+
+## [3]
+## format dates like this
+sf <- lubridate::stamp("Sun, 5th Aug")
+
+
+## [4] update 'ncov.gif' dataset (DO NOT RUN THIS BLOCK MORE THAN ONCE)
+ncov.gif <- ncov.gif %>%
+
+  ### y-position
+  group_by(date, anim) %>%
+  mutate(
+    y_rank = rank(-confirmed, na.last = TRUE, ties.method = "random")
+  ) %>%
+  ungroup() %>%
+  
+  ### x-position
+  group_by(anim) %>%
+  mutate(
+    x_confirmed = x_range$upper*confirmed/max(confirmed),
+    x_recovered = x_confirmed*(recovered/confirmed),
+    x_deaths = x_confirmed*(deaths/confirmed)
+  ) %>%
+  ungroup() %>%
+  
+  ### custom text
+  mutate(
+    #### date
+    datef = sf(date),
+    #### x-axis
+    x_title = ifelse(anim==1,
+      "Confirmed cases",
+      "Confirmed cases (per 100,000 population)"
+    ),
+    #### message popups
+    msg = case_when(
+      between(date, left=msg1_range$from, right=msg1_range$to) ~ msg1,
+      between(date, left=msg2_range$from, right=msg2_range$to) ~ msg2,
+      between(date, left=msg3_range$from, right=msg3_range$to) ~ msg3,
+      between(date, left=msg4_range$from, right=msg4_range$to) ~ msg4,
+      between(date, left=msg5_range$from, right=msg5_range$to) ~ msg5,
+      between(date, left=msg6_range$from, right=msg6_range$to) ~ msg6,
+      between(date, left=msg7_range$from, right=msg7_range$to) ~ msg7,
+    TRUE ~ as.character("")
+    )
+  ) %>%
+      
+  ### format display of numbers (tricky because we have 2 different scales...
+  ###   anim==1, and anim==2, so we use formatC() to fix this)
+  mutate(confirmedf = ifelse(anim==1,
+    formatC(confirmed, big.mark = ',', digits=0, format = "f"),
+    formatC(confirmed, digits = 2, format = "fg"))) %>%
+
+  ### get only top 10 countries (and confirmed > 0, to prevent random ties)
+  filter(y_rank <= 10 & confirmed > 0)
+  
+## [5]
+## to avoid "ugly text" caused by identical text overlapping, we have to ...
+##   make sure we only have 1 text item per animation state (in this case, 'date')
+ncov.gif$x_title[ncov.gif$y_rank != 1] = ""
+ncov.gif$datef[ncov.gif$y_rank != 1] = ""
+ncov.gif$msg[ncov.gif$y_rank != 1] = ""
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# you can ignore the warning above, it's produced from [3].
+
+```
+
+
+```{r}
+#________________________________________________________________________________#
+# create static plot 
+# note: will include multiple dates, so it's not ideal to actually plot since...
+#       the data for each date will overlap. (Must filter: date == max(date))
+  
+## [1] plot (static)
+
+a.plot <- ncov.gif %>%
+  
+  ggplot(aes(y = y_rank, group=iso3c)) +
+  
+  ## confirmed cases (bar)
+  geom_tile(
+    aes(x = x_confirmed/2, width = x_confirmed),
+    height = 0.8,
+    fill = "#F8766D" #ggplot's default n=3 red
+  ) +
+  
+  ## recovered cases (bar)
+  geom_tile(
+    aes(x = x_recovered/2, width = x_recovered),
+    height = 0.6,
+    fill = "light green"
+  ) +
+  
+  ## deaths (bar)
+  geom_tile(
+    aes(x = x_deaths/2, width = x_deaths),
+    height = 0.4, fill = "black"
+  ) +
+  
+  ## label: confirmed bar
+  geom_text(
+    aes(x = x_confirmed, label =  paste0(" ", confirmedf)),
+    color = "black",
+    hjust = 0,
+    size = 4,
+    fontface = 'bold'
+  ) +
+  
+  ## label: current state (date)
+  geom_text(
+    aes(y = 7.5, x = 1.1*xy_legend$x, label =  datef),
+    size = 7,
+    hjust=1
+  ) +
+  
+  ## label: custom x-axis title
+  geom_text(
+    aes(y = 10.5, x = xy_legend$x/2, label = x_title),
+    size = 4
+  ) +
+  
+  ## display custom message
+  geom_text(
+    aes(y = 4.5, x = 12, label = str_wrap(msg, width = 20)),
+    size = 4.5
+  ) +
+  
+  ## label: y-axis
+  geom_text(
+    ### paste(country, " ") prevents weird spacing issues...
+    ### credit: Jon Spring, Stackoverflow [https://tinyurl.com/y8pnu7cn]
+    aes(x = 0, label = paste(country, " ")),
+    hjust = 1,
+    vjust = 0.3
+  ) +
+
+  ## label: title, subtitle, caption
+  labs(
+    title = paste0("The Spread of COVID-19"),
+    subtitle = "Top 10 countries ranked by confirmed cases",
+    caption = "Data Source: John Hopkins Unversity CSSE Data Repo \n Graphic (gif) by: C.Conrady (CNRCHR003) "
+  ) +
+ 
+  ## format: axis
+  scale_y_reverse() + ### rank = 1 at top
+  scale_x_continuous(limits = c(-.15*x_range$upper, 1.10*x_range$upper)) + ### extend plot area
+  geom_vline(xintercept = 0) +
+  
+  ## format: plot
+  theme(
+    ### removing
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank(),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    legend.position = "none",
+    
+    ### adding
+    plot.background = element_rect(fill = "#fafafa"),
+    panel.background = element_rect(fill = "#fafafa"),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"),
+    plot.title = element_text(
+      face = "bold",
+      margin = margin(0, 0, 0.1, 0, "cm"),
+      hjust=0.5
+    ),
+    plot.subtitle = element_text(
+      margin = margin(0, 0, -.2, 0, "cm"),
+      hjust=0.5
+    ),
+    plot.caption = element_text(
+      face = "italic",
+      hjust = 0.5,
+      color="#444444")
+  ) +
+  
+  ## --- Legend ---
+
+  ## confirmed (mini bar for legend)
+  geom_segment(
+    aes(y = xy_legend$y, yend = xy_legend$y, x = .8*xy_legend$x, xend=1.1*xy_legend$x),
+    size = 6,
+    color = "#F8766D"
+  ) +
+
+  ## recovered (mini bar for legend)
+  geom_segment(
+    aes(y = xy_legend$y, yend = xy_legend$y, x = .8*xy_legend$x, xend=1*xy_legend$x),
+    size = 4.5,
+    color = "light green"
+  ) +
+
+  ## deaths (mini bar for legend)
+  geom_segment(
+    aes(y = xy_legend$y, yend = xy_legend$y, x = .8*xy_legend$x, xend=0.90*xy_legend$x),
+    size = 3,
+    color = "black"
+  ) +
+
+  ## label: arrow for legend bars
+  annotate(
+    y = xy_legend$y, yend = xy_legend$y-1.5, x = 1.05*xy_legend$x, xend = 0.8*xy_legend$x,
+    geom = "curve", curvature = .2,
+    arrow = arrow(length = unit(2, "mm"))
+  ) +
+  annotate(
+    y = xy_legend$y, yend = xy_legend$y-1, x = 0.95*xy_legend$x, xend = 0.8*xy_legend$x,
+    geom = "curve", curvature = .2,
+    arrow = arrow(length = unit(2, "mm"))
+  ) +
+  annotate(
+    y = xy_legend$y, yend = xy_legend$y-.5, x = .85*xy_legend$x, xend = 0.8*xy_legend$x,
+    geom = "curve", curvature = .2,
+    arrow = arrow(length = unit(2, "mm"))
+  ) +
+
+  ## label: text for legend bars
+  annotate("text",
+      y = c(xy_legend$y-0.5-0.1, xy_legend$y-1-0.1, xy_legend$y-1.5-0.1), x = .8*xy_legend$x, size = 3.5,
+      hjust = 1,
+      label = c("deaths ", "recovered ", "confirmed ")
+  )
+
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# create animation 
+
+a.gif <- a.plot +
+  ## date as transition state
+  transition_states(date, transition_length = 3, state_length = 1) +
+  ## smoothing on tweening
+  ease_aes('cubic-in-out') +
+  enter_fade() +
+  exit_fade() +
+  ## country names can sometimes overlap on transitions, this prevents this
+  exit_disappear(early = FALSE)
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# set animation options, and save output as ---gif---
+
+if (!dir.exists("anim")) {
+  dir.create("anim")
+}
+
+animate(a.gif, width = 600, height = 400,
+  nframes = 500,
+  fps = 10,
+  renderer = gifski_renderer(file.path("anim", "covid19_v3_05.gif"))
+)
+
+```
+
+```{r}
+#________________________________________________________________________________#
+# set animation options, and save output as ---mp4---
+
+if (FALSE) {
+  
+    if (!dir.exists("anim")) {
+    dir.create("anim")
+  }
+  
+  animate(a.gif, width = 600, height = 400,
+    nframes = 500,
+    fps = 10,
+    renderer = av_renderer(file.path("anim", "covid19_v3_05.mp4"))
+  )
+}
+
+
+```
+
+
+```{r}
+
+# TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO TO-DO
+#__________________________________________________________________________________________#
+
+# --- complete ---
+#[x] add a 'frame' var
+#    [x] format display of case numbers
+#[x] add legend
+#[x] display date (lubridate)/ remove 'state'
+#[x] something to indicate 2nd dataset is 'per capita' or per 100k
+#[x] format x-axis (title)
+#[x] message popups
+
+# --- cosmetic ---
+#[ ] Try different fonts
+#[ ] format x-axis (minor/ major lines)
+#[ ] % numbers for (recovered, death)
+#[ ] yellow highlight on x-title axis
+#[ ] bullet effect at certain important points*1
+#[ ] highlight top10 final frame in anim==1, for anim==2
+#[ ] message popups (yellow highlight)
+#[ ] rate inc.(7day-moving-avg) of confirmed bar
+
+
+# *1
+# https://stackoverflow.com/questions/53092216/any-way-to-pause-at-specific-frames-time-points-with-transition-reveal-in-gganim
+
+```
+
