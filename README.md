@@ -1,100 +1,51 @@
-# CoVid19: Data Viz in R (ggplot2) & Shiny
+# COVID-19: Data Animation in R (and RStudio)
 
-[![CC BY 4.0][cc-by-shield]][cc-by]
-
-[cc-by]: http://creativecommons.org/licenses/by/4.0/
-[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
-
-Still used today, the most widely used method of analysis for marine ecological data is manual review by trained human experts. The majority of analysis of this data is concerned with extracting information on the abundance, distribution and behaviour of the studied marine organism(s). This task can be broken down into four sub-tasks, frequently performed on a target species: (_i_) locate, (_ii_) identify, (_iii_) count, and (_iv_) track. **This research proposes an object detection and tracking algorithm for red roman (_Chrysoblephus laticeps_) in Cape Town, South Africa.** The model is capable of automating all four sub-tasks above at a test accuracy of mAP<sub>50</sub> = 81.45% on previously unseen footage. This research serves as a proof-of-concept that machine learning based methods of video analysis of marine data can replace or at least supplement human analysis.
+INTRO HERE.
 
 <p align="center">
-  <img src="assets/A3_COV19_Rviz3.gif" alt="animated" />
+  <img src="assets/A3_COV19_Rviz3.gif" alt="animated"/>
 </p>
+
+
+## Background
+
+The bar chart race, a type of bar chart but with a little more pizazz, has gone viral across social media platforms. But despite its obvious popularity, can the humble bar chart really give useful insight into the spread of the COVID-19 pandemic? I think it can.
+
+The success of a bar chart lies in its simplicity. When it comes to comparing the values of things, especially categories of things, the bar graph is one of the most commonly used visualisations, and for a good reason. It’s intuitive, easy to read and interpret even for those without a background in data. But this simplicity comes at a cost; a typical bar chart will
+convey at most two dimensions of data, and is less useful for showing how this data changes over time. Enter the bar chart race.
+
+An animated bar chart, or a bar chart race, is an interesting way to show how categorical data changes over time. A bar chart race is to a static bar chart as a movie is to an image, it is simply a stacked collection of images (or frames) stitched together in the correct order and played sequentially. And when used to visualise the spread of COVID-19, it can yield some interesting results.
+
+The gif above compares confirmed COVID-19 cases by country over the period January 22nd to March 31st, in two parts: first by the total confirmed cases per country, and second, by confirmed cases adjusted for the relative size of the population of each country (in this case, per 100,000). The latter, which is generally the gold standard for comparing country level statistics like crime, provides a new perspective - for example, the US may have the largest number of confirmed cases in the world, but when taking into account the comparatively large population of the US, it falls somewhere in the middle of its peers.
+Total confirmed cases
+
+TIP: Useful for tracking the spread of COVID-19 around the world, but not so useful in making comparisons between countries.
+
+The number of confirmed COVID-19 cases in China seems to grow exponentially1 through January and February far exceeding other countries around the world before being replaced by Italy and then the US (the current epicenter of the disease as of March 31st).
+
+The number of recovered cases in China increases steadily, picking up pace towards the end of February. At the same time, the number of new confirmed cases seem to slow. By the first week of March, the majority of patient outcomes were reported as recovered. (While all countries have a fair share of recovered outcomes, by the end of March China is the only country in which the majority of cases are recovered.)
+
+For all countries, the number of COVID-19 cases that result in death (black bar) are a small percentage of total cases, but Italy and Spain have a higher percentage of reported deaths when compared to all other countries on the list.
+
+By the end of March, it’s clear that Europe has the highest number of COVID-19 cases, with 6 nations taking top spots in the ranking. By contrast, at the end of January, 7 of the top 10 ranked countries were Asian nations (Germany the single European nation).
 
 ## Installation
 
-The red roman model relies on the [matterport implementation](https://github.com/matterport/Mask_RCNN) of [Mask R-CNN](https://arxiv.org/abs/1703.06870) (requires "installation"). The model combines the matterport library with a generic [centroid object tracking](https://www.pyimagesearch.com/2018/07/23/simple-object-tracking-with-opencv/) method (does not require installation).
+```r
 
-Note: The files provided in this repository (dataset, weights, model) should be copied into the [Mask_RCNN](https://github.com/matterport/Mask_RCNN) directory created in step 1.
+## data frame manipulation
+if(!require(tidyverse)) {install.packages("tidyverse"); library(tidyverse)}
+if(!require(lubridate)) {install.packages("lubridate"); library(lubridate)}
 
-1. Clone the [Matterport Mask R-CNN repository](https://github.com/matterport/Mask_RCNN) and follow the installation instructions. You may be required to install additional software.
-2. Download the red roman dataset splits `train`, `test` and `val`, available in this respository [here](https://github.com/FishCV/fishcv.github.io/tree/main/dataset/via). These datasets should be placed in the path: `../Mask_RCNN/datasets/redroman/`. (This will be inside the local matterport directory created in 1.)
-3. For inference, download `mask_rcnn_redroman.h5` from [here](https://drive.google.com/drive/folders/1ltqEYAN5qIrL1B_SHkg6SYGlIRaUX7-o?usp=sharing). Save in path: `../Mask_RCNN/weights/redroman/`.
-4. Download `redroman.py` python script and `pyimagesearch` lib (for training and inference) and `mAP.ipynb` (for model evaluation) from [here](https://github.com/FishCV/fishcv.github.io/tree/main/model). These should be placed in the path: `../Mask_RCNN/samples/redroman/`
-5. Setup a Python environment (an Anaconda virtual environment is recommended). Please use the environment file [here](https://github.com/FishCV/fishcv.github.io/tree/main/model) for this purpose.
-6. From the console, `cd` into `../Mask_RCNN/samples/redroman/` to execute sample code (see below) for training/ inference.
+### animated plots
+if(!require(ggplot2)) {install.packages("ggplot2"); library(ggplot2)}
+if(!require(gganimate)) {install.packages("gganimate"); library(gganimate)}
+if(!require(transformr)) {install.packages("transformr"); library(transformr)}
+if(!require(gifski)) {install.packages("gifski"); library(gifski)}
+if(!require(av)) {install.packages("av"); library(av)}
 
-## Training
-
-1. Train a new model starting from pre-trained COCO weights  
-```
-python redroman.py train --dataset=..\..\datasets\redroman\ --weights=coco
-```
-
-2. Resume training a model from last trained weights (or select specific weights file)  
-```
-redroman.py train --dataset=..\..\datasets\redroman\ --weights=last
-```
-or
-``` 
-python redroman.py train --dataset=..\..\datasets\redroman\ --weights=..\..\weights\redroman\mask_rcnn_redroman.h5
-```
-
-## Inference
-
-1.  **(Image)** Detection (bbox, mask, centroid)
-```
-python redroman.py detect --weights=..\..\weights\redroman\mask_rcnn_redroman.h5 --image=..\..\datasets\inference\redroman\images
-```
-(Note: Inference is performed on a folder of images. If you'd like to run the model on a single image, make a separate folder containing this single image.)  
-
-2. **(Video)** Detection (bbox, mask, centroid)
-```
-python redroman.py detect --weights=..\..\weights\redroman\mask_rcnn_redroman.h5 --video=..\..\datasets\inference\redroman\video\sample_video.MP4
-```
-
-3. **(Video with centroid tracking)** Detection (bbox, mask, centroid)
-```
-python redroman.py detect --weights=..\..\weights\redroman\mask_rcnn_redroman.h5 --video=..\..\datasets\inference\redroman\video\sample_video.MP4 --tracking Y
-```
-
-## Model Parameters
-
-There are a number of model parameters that can be tuned during training (see below for some examples). Please see the [Matterport Wiki](https://github.com/matterport/Mask_RCNN/wiki) for help on this.
-
-```python
-class FishConfig(Config):
-    """
-    Configuration for training on your own dataset (red roman dataset).
-    Derives from the base Config class and overrides some values.
-    """
-
-    # [1]
-    BACKBONE = "resnet50"
-
-    # [2]
-    IMAGE_MIN_DIM = 460; IMAGE_MAX_DIM = 576
-
-    # [3]
-    GPU_COUNT = 1; IMAGES_PER_GPU = 1
-
-    # [4]
-    TRAIN_ROIS_PER_IMAGE = 100
-    STEPS_PER_EPOCH = 300
-    VALIDATION_STEPS = 100
-    MAX_GT_INSTANCES = 10
-    
-```
-
-You can also override some parameters that will apply only when the model is set to inference.
-
-```python
-class FishInferenceConfig(FishConfig):
-    """
-    Configuration for inference on test data (red roman dataset).
-    Derives from the FishConfig class (and by extension, Base Config class) and overrides some values.
-    """
-    
-    # [1] e.g. You can increase this during training to generate more propsals.
-    RPN_NMS_THRESHOLD = 0.7    
+### labelling plots
+if(!require(directlabels)) {install.packages("directlabels"); library(directlabels)}
+if(!require(ggrepel)) {install.packages("ggrepel"); library(ggrepel)}
+  
 ```
