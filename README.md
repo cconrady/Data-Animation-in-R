@@ -7,7 +7,7 @@ INTRO HERE.
 </p>
 
 
-## Background
+## Ready, set, gif! (Background)
 
 The bar chart race, a type of bar chart but with a little more pizazz, has gone viral across social media platforms. But despite its obvious popularity, can the humble bar chart really give useful insight into the spread of the COVID-19 pandemic? I think it can.
 
