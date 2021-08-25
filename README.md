@@ -27,7 +27,19 @@ The gif above compares confirmed COVID-19 cases by country over the period Janua
 
 Disclaimer: TALK ABOUT HOW A GOOD VISUALISATION SHOULD GIVE YOU ALL THE INFORMATION YOU NEED WITHIN A COUPLE SECONDS. AND A STATIC CAN ACHIVE THE ABOVE. GET HEATMAP TO DEMONSTRATE.
 
+LIKE THIS:
+
+Note
+In preparing the gif, I have tried to adhere to as many good principles of design as possible. A notable exception is the x-axis. While there is a title, there are no tick marks and no grid lines. I did this because I wanted to include the 2nd part (confirmed cases per 100k population) in a single gif, and this part works on a different scale to the 1st. It has been correctly scaled, but it’s tricky to label. However, I do feel that providing labels for the confirmed (red) bar somewhat softens the need for gridlines, as the value does not have to be read off, but of course it would have been more ideal to include them. And while the green and black bars are meant only for getting a visual estimate, gridlines would have allowed for a more precise estimate.
+Resources
+https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f
+https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da
+https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619
+https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506
+
 ## Installation
+
+ALSO DO THIS HERE.
 
 ```r
 
