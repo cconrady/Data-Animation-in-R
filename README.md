@@ -27,19 +27,21 @@ Consider the below heatmap (also done using R, by the way). It's known as a "sta
   <img src="assets/A3_COV19_RViz2_Sample.jpeg"/>
 </p>
 
-Do a quick test yourself, here's a few things you should have noted from the bar chart race. Can you get the same information from the heatmap? The big difference with the heatmap is that you get all of this information almost instantaneously. And that's pretty important when it comes to designing "good" visualisations<sup>\*</sup>. 
+Do a quick test yourself, here's a few things you should have noted from the bar chart race. Can you get the same information from the heatmap? The big difference with the heatmap is that you get all of this information almost instantaneously. And that's pretty important when it comes to designing "good" visualisations<sup>\*</sup>.
 
-- The number of confirmed COVID-19 cases in China increase through January and February far exceeding other countries around the world before being replaced by Italy and then the US (the current epicenter of the disease as of March 31st).
+- Starting in February and heading into March, there is a large increase in China of new confirmed cases per day. This peaks in February and steadily reduces heading into April.
 
-- The number of recovered cases in China increases steadily, picking up pace towards the end of February. At the same time, the number of new confirmed cases seem to slow. By the first week of March, the majority of patient outcomes were reported as recovered. (While all countries have a fair share of recovered outcomes, by the end of March China is the only country in which the majority of cases are recovered.)
+- Europe becomes the new epicenter of COVID-19 by the end of March as daily confirmed cases spike in Italy, Spain, Germany and the UK. 
 
-- By the end of March, it’s clear that Europe has the highest number of COVID-19 cases, with 6 nations taking top spots in the ranking. By contrast, at the end of January, 7 of the top 10 ranked countries were Asian nations (Germany the single European nation).
+- The United States replaces Europe as the epicenter of COVID-19, experiencing the highest spike in daily confirmed cases of all countries considered.
 
 <em><sup>\*</sup>So there's a way to grade a visualization, like on a discrete scale of "bad" or "good". And it's this: consider that a visualization exists only to answer a question. Does it answer this question *well* and *quickly*, then it's a good visualization. Does it take a second glance, a bit of explanation, to get your point across? Then it's a "bad" visualization.</em>
 
-It's like seeing the formation of the universe, all the ice ages, the extinction of dinosaurs, the first and second world war, right up to the present day, everything that is and has ever been, all at once. So ditch the bar chart race, and the linear propogation of time. It's old fashioned. It's analog. And you're better than that.
+It's like seeing the formation of the universe, all the ice ages, the extinction of dinosaurs, the first and second world wars, right up to the present day, everything that is and has ever been, all at once. So ditch the bar chart race, and the linear propogation of time in animations. It's old-fashioned. It's analog. And you're better than that.
 
-Discaimer: here are some resources that were invaluable in creating this repo [1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
+PS. Here are some resources that were invaluable in creating this repo [1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
+
+PPS. Because I found a way to include recovery and death data in the bar chart race (by simply overlaying them, each slightly smaller in width), the bar chart race actually conveys two more dimensions than the heatmap, and because of this gives a lot more information and can answer more questions. But what did you except me to do? I was already halfway through this post when I realised that, and I wasn't about to start over.
 
 ## Installation
 
