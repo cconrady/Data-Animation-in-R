@@ -41,7 +41,7 @@ It's like seeing the formation of the universe, all the ice ages, the extinction
 
 PS. Here are some resources that were invaluable in creating this repo [1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
 
-PPS. Because I found a way to include recovery and death data in the bar chart race (by simply overlaying them, each slightly smaller in width), the bar chart race actually conveys two more dimensions than the heatmap, and because of this it gives a lot more information and can answer more questions. But what did you except me to do? I was already halfway through this post when I realised that, and I wasn't about to start over.
+PPS. Because I found a way to include recovery and death data in the bar chart race (by simply overlaying them, each slightly smaller in width), the bar chart race actually conveys two more dimensions than the heatmap, and because of this it gives a lot more information and can answer more questions. But what did you except me to do? I was already halfway through this post when I had the Eureka moment of improving the bar chart race, and I wasn't about to start over.
 
 ## Installation
 
