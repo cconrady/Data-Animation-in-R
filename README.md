@@ -24,7 +24,7 @@ When you break it down, a bar chart race is essentially a stack of bar charts st
 Consider the below heatmap (also done using R, by the way). It's known as a "static" visualization, as in it's not animated like the bar chart race. In fact, it conveys the very same information as the bar chart race at the top of the page, but *all at once*.
 
 <p align="center">
-  <img src="assets/A3_COV19_RViz2_Sample.JPG" alt="animated"/>
+  <img src="assets/A3_COV19_RViz2_Sample.jpeg"/>
 </p>
 
 Do a quick test yourself, here's a few things you should have noted from the bar chart race. Can you get the same information from the heatmap? The big difference with the heatmap is that you get all of this information almost instantaneously. And that's pretty important when it comes to designing "good" visualisations<sup>\*</sup>. 
@@ -39,7 +39,7 @@ Do a quick test yourself, here's a few things you should have noted from the bar
 
 It's like seeing the formation of the universe, all the ice ages, the extinction of dinosaurs, the first and second world war, right up to the present day, everything that is and has ever been, all at once. So ditch the bar chart race, and the linear propogation of time. It's old fashioned. It's analog. And you're better than that.
 
-Discaimer: here are some resources that were invaluable in creating this repo [\1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [\2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [\3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [\4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
+Discaimer: here are some resources that were invaluable in creating this repo [1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
 
 ## Installation
 
