@@ -35,15 +35,11 @@ Do a quick test yourself, here's a few things you should have noted from the bar
 
 - By the end of March, it’s clear that Europe has the highest number of COVID-19 cases, with 6 nations taking top spots in the ranking. By contrast, at the end of January, 7 of the top 10 ranked countries were Asian nations (Germany the single European nation).
 
-<sup>\*</sup>So there's a way to grade a visualization, like on a discrete scale of "bad" or "good". And it's this: consider that a visualization exists only to answer a question. Does it answer this question *well* and *quickly*, then it's a good visualization. Does it take a second glance, a bit of explanation, to get your point across? Then it's a "bad" visualization.
+<em><sup>\*</sup>So there's a way to grade a visualization, like on a discrete scale of "bad" or "good". And it's this: consider that a visualization exists only to answer a question. Does it answer this question *well* and *quickly*, then it's a good visualization. Does it take a second glance, a bit of explanation, to get your point across? Then it's a "bad" visualization.</em>
 
 It's like seeing the formation of the universe, all the ice ages, the extinction of dinosaurs, the first and second world war, right up to the present day, everything that is and has ever been, all at once. So ditch the bar chart race, and the linear propogation of time. It's old fashioned. It's analog. And you're better than that.
 
-Discaimer: here are some resources that were invaluable in creating this repo.
-`https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f`
-https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da
-https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619
-https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506
+Discaimer: here are some resources that were invaluable in creating this repo [\1](https://towardsdatascience.com/channel-your-creativity-interactive-and-animated-graphics-in-r-with-covid-19-data-5f7bede4b29f), [\2](https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da), [\3](https://towardsdatascience.com/https-towardsdatascience-com-everything-you-need-to-know-about-animated-bar-charts-be033f398619), [\4](https://medium.com/@korkmazarda1/creating-an-animated-bar-plot-in-r-de9200f57506).
 
 ## Installation
 
